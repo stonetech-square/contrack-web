@@ -25,6 +25,22 @@ function App() {
         setStatus('ready')
       } else {
         const hashParams = new URLSearchParams(window.location.hash.substring(1))
+
+        // Check for Supabase error parameters first
+        const errorCode = hashParams.get('error_code')
+        const errorDescription = hashParams.get('error_description')
+
+        if (errorCode) {
+          setStatus('error')
+          if (errorCode === 'otp_expired') {
+            setErrorMessage('Your invitation link has expired. Please contact your administrator to send a new invitation.')
+          } else {
+            setErrorMessage(errorDescription ? decodeURIComponent(errorDescription.replace(/\+/g, ' ')) : 'Authentication failed. Please contact your administrator.')
+          }
+          window.history.replaceState({}, document.title, window.location.pathname)
+          return
+        }
+
         const accessToken = hashParams.get('access_token')
         const refreshToken = hashParams.get('refresh_token')
 
