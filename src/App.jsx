@@ -1,0 +1,266 @@
+import { useState, useEffect } from 'react'
+import { supabase } from './supabase'
+import './App.css'
+
+function App() {
+  const [password, setPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [status, setStatus] = useState('loading') // loading, ready, submitting, success, error
+  const [errorMessage, setErrorMessage] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
+
+  useEffect(() => {
+    // Check if we have a valid session from the invite link
+    const checkSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession()
+
+      if (error) {
+        setStatus('error')
+        setErrorMessage('Invalid or expired invitation link. Please contact your administrator.')
+        return
+      }
+
+      if (session) {
+        setStatus('ready')
+      } else {
+        // Try to get session from URL hash (Supabase redirects with tokens in hash)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1))
+        const accessToken = hashParams.get('access_token')
+        const refreshToken = hashParams.get('refresh_token')
+
+        if (accessToken && refreshToken) {
+          const { error: setSessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          })
+
+          if (setSessionError) {
+            setStatus('error')
+            setErrorMessage('Failed to verify your invitation. Please try again or contact support.')
+          } else {
+            setStatus('ready')
+            // Clean up URL
+            window.history.replaceState({}, document.title, window.location.pathname)
+          }
+        } else {
+          setStatus('error')
+          setErrorMessage('Invalid invitation link. Please use the link sent to your email.')
+        }
+      }
+    }
+
+    checkSession()
+  }, [])
+
+  const validatePassword = () => {
+    if (password.length < 8) {
+      return 'Password must be at least 8 characters long'
+    }
+    if (!/[A-Z]/.test(password)) {
+      return 'Password must contain at least one uppercase letter'
+    }
+    if (!/[a-z]/.test(password)) {
+      return 'Password must contain at least one lowercase letter'
+    }
+    if (!/[0-9]/.test(password)) {
+      return 'Password must contain at least one number'
+    }
+    if (password !== confirmPassword) {
+      return 'Passwords do not match'
+    }
+    return null
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    const validationError = validatePassword()
+    if (validationError) {
+      setErrorMessage(validationError)
+      return
+    }
+
+    setStatus('submitting')
+    setErrorMessage('')
+
+    try {
+      const { error } = await supabase.auth.updateUser({ password })
+
+      if (error) {
+        setStatus('ready')
+        setErrorMessage(error.message || 'Failed to set password. Please try again.')
+        return
+      }
+
+      setStatus('success')
+    } catch (err) {
+      setStatus('ready')
+      setErrorMessage('An unexpected error occurred. Please try again.')
+    }
+  }
+
+  const getPasswordStrength = () => {
+    if (!password) return { strength: 0, label: '' }
+
+    let strength = 0
+    if (password.length >= 8) strength++
+    if (/[A-Z]/.test(password)) strength++
+    if (/[a-z]/.test(password)) strength++
+    if (/[0-9]/.test(password)) strength++
+    if (/[^A-Za-z0-9]/.test(password)) strength++
+
+    const labels = ['', 'Weak', 'Fair', 'Good', 'Strong', 'Very Strong']
+    return { strength, label: labels[strength] }
+  }
+
+  const { strength, label } = getPasswordStrength()
+
+  if (status === 'loading') {
+    return (
+      <div className="container">
+        <div className="card">
+          <div className="loading">
+            <div className="spinner"></div>
+            <p>Verifying your invitation...</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (status === 'error') {
+    return (
+      <div className="container">
+        <div className="card">
+          <div className="error-state">
+            <div className="error-icon">!</div>
+            <h2>Something went wrong</h2>
+            <p>{errorMessage}</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  if (status === 'success') {
+    return (
+      <div className="container">
+        <div className="card">
+          <div className="success-state">
+            <div className="success-icon">✓</div>
+            <h2>Account Setup Complete!</h2>
+            <p>Your password has been set successfully. You can now log in to the ERGP application.</p>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="container">
+      <div className="card">
+        <div className="header">
+          <h1>Complete Your Account</h1>
+          <p>Create a secure password to finish setting up your account</p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="password">New Password</label>
+            <div className="input-wrapper">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Enter your password"
+                disabled={status === 'submitting'}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowPassword(!showPassword)}
+                tabIndex={-1}
+              >
+                {showPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
+            {password && (
+              <div className="password-strength">
+                <div className="strength-bar">
+                  <div
+                    className={`strength-fill strength-${strength}`}
+                    style={{ width: `${(strength / 5) * 100}%` }}
+                  ></div>
+                </div>
+                <span className={`strength-label strength-${strength}`}>{label}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirm Password</label>
+            <div className="input-wrapper">
+              <input
+                id="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
+                disabled={status === 'submitting'}
+                autoComplete="new-password"
+              />
+              <button
+                type="button"
+                className="toggle-password"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                tabIndex={-1}
+              >
+                {showConfirmPassword ? '🙈' : '👁️'}
+              </button>
+            </div>
+            {confirmPassword && password !== confirmPassword && (
+              <span className="field-error">Passwords do not match</span>
+            )}
+            {confirmPassword && password === confirmPassword && (
+              <span className="field-success">Passwords match</span>
+            )}
+          </div>
+
+          {errorMessage && (
+            <div className="error-message">{errorMessage}</div>
+          )}
+
+          <div className="requirements">
+            <p>Password must contain:</p>
+            <ul>
+              <li className={password.length >= 8 ? 'met' : ''}>At least 8 characters</li>
+              <li className={/[A-Z]/.test(password) ? 'met' : ''}>One uppercase letter</li>
+              <li className={/[a-z]/.test(password) ? 'met' : ''}>One lowercase letter</li>
+              <li className={/[0-9]/.test(password) ? 'met' : ''}>One number</li>
+            </ul>
+          </div>
+
+          <button
+            type="submit"
+            className="submit-btn"
+            disabled={status === 'submitting' || !password || !confirmPassword}
+          >
+            {status === 'submitting' ? (
+              <>
+                <span className="btn-spinner"></span>
+                Setting up...
+              </>
+            ) : (
+              'Complete Setup'
+            )}
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+export default App
