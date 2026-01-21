@@ -5,13 +5,13 @@ import './App.css'
 function App() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [status, setStatus] = useState('loading') // loading, ready, submitting, success, error
+  const [status, setStatus] = useState('loading') 
   const [errorMessage, setErrorMessage] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
 
   useEffect(() => {
-    // Check if we have a valid session from the invite link
+    
     const checkSession = async () => {
       const { data: { session }, error } = await supabase.auth.getSession()
 
@@ -24,7 +24,6 @@ function App() {
       if (session) {
         setStatus('ready')
       } else {
-        // Try to get session from URL hash (Supabase redirects with tokens in hash)
         const hashParams = new URLSearchParams(window.location.hash.substring(1))
         const accessToken = hashParams.get('access_token')
         const refreshToken = hashParams.get('refresh_token')
@@ -40,7 +39,6 @@ function App() {
             setErrorMessage('Failed to verify your invitation. Please try again or contact support.')
           } else {
             setStatus('ready')
-            // Clean up URL
             window.history.replaceState({}, document.title, window.location.pathname)
           }
         } else {
