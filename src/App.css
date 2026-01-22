@@ -350,6 +350,147 @@ form {
   font-size: 0.875rem;
 }
 
+/* Download Section */
+.download-section {
+  margin-top: 32px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.download-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.download-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.download-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-radius: 10px;
+  text-decoration: none;
+  transition: transform 0.1s, box-shadow 0.2s;
+  border: 2px solid var(--border);
+  background: var(--bg-card);
+}
+
+.download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.download-btn:active {
+  transform: translateY(0);
+}
+
+.download-btn .download-icon {
+  font-size: 1.5rem;
+  width: 32px;
+  text-align: center;
+}
+
+.download-btn .download-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.download-btn .download-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+}
+
+.download-btn .download-platform {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.download-btn.windows {
+  border-color: #0078d4;
+}
+
+.download-btn.windows:hover {
+  background: rgba(0, 120, 212, 0.05);
+}
+
+.download-btn.mac {
+  border-color: #555555;
+}
+
+.download-btn.mac:hover {
+  background: rgba(85, 85, 85, 0.05);
+}
+
+.download-btn.linux {
+  border-color: #e95420;
+}
+
+.download-btn.linux:hover {
+  background: rgba(233, 84, 32, 0.05);
+}
+
+/* Download Link Section (on form page) */
+.download-link-section {
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.download-link-section p {
+  font-size: 0.875rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.download-link-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: background-color 0.2s;
+  font-family: inherit;
+}
+
+.download-link-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* Back Link Button */
+.back-link-btn {
+  display: block;
+  width: 100%;
+  margin-top: 20px;
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 6px;
+  transition: background-color 0.2s, color 0.2s;
+  font-family: inherit;
+}
+
+.back-link-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text-primary);
+}
+
 /* Responsive */
 @media (max-width: 480px) {
   .card {

@@ -26,7 +26,7 @@ function App() {
       } else {
         const hashParams = new URLSearchParams(window.location.hash.substring(1))
 
-        // Check for Supabase error parameters first
+        
         const errorCode = hashParams.get('error_code')
         const errorDescription = hashParams.get('error_description')
 
@@ -157,15 +157,54 @@ function App() {
     )
   }
 
-  if (status === 'success') {
+  if (status === 'success' || status === 'downloads') {
     return (
       <div className="container">
         <div className="card">
           <div className="success-state">
-            <div className="success-icon">✓</div>
-            <h2>Account Setup Complete!</h2>
-            <p>Your password has been set successfully. You can now log in to the ERGP application.</p>
+            <div className="success-icon">{status === 'success' ? '✓' : '↓'}</div>
+            <h2>{status === 'success' ? 'Account Setup Complete!' : 'Download Contrak ERGP'}</h2>
+            <p>
+              {status === 'success'
+                ? 'Your password has been set successfully. Download the Contrak ERGP app and sign in with your email and new password.'
+                : 'Download the app for your platform and sign in with your email and password.'}
+            </p>
           </div>
+          <div className="download-section">
+            <h3>Available Downloads</h3>
+            <div className="download-buttons">
+              <a href="#" className="download-btn windows">
+                <span className="download-icon">⊞</span>
+                <span className="download-text">
+                  <span className="download-label">Download for</span>
+                  <span className="download-platform">Windows</span>
+                </span>
+              </a>
+              <a href="https://ymwljegqufoyonilnoie.supabase.co/storage/v1/object/public/instalations/contrack.dmg" className="download-btn mac">
+                <span className="download-icon"></span>
+                <span className="download-text">
+                  <span className="download-label">Download for</span>
+                  <span className="download-platform">macOS</span>
+                </span>
+              </a>
+              <a href="#" className="download-btn linux">
+                <span className="download-icon">⬡</span>
+                <span className="download-text">
+                  <span className="download-label">Download for</span>
+                  <span className="download-platform">Linux</span>
+                </span>
+              </a>
+            </div>
+          </div>
+          {status === 'downloads' && (
+            <button
+              type="button"
+              className="back-link-btn"
+              onClick={() => setStatus('ready')}
+            >
+              Back to password setup
+            </button>
+          )}
         </div>
       </div>
     )
@@ -272,6 +311,17 @@ function App() {
             )}
           </button>
         </form>
+
+        <div className="download-link-section">
+          <p>Already set up your password?</p>
+          <button
+            type="button"
+            className="download-link-btn"
+            onClick={() => setStatus('downloads')}
+          >
+            Download the App
+          </button>
+        </div>
       </div>
     </div>
   )
