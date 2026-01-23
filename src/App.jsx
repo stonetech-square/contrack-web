@@ -173,7 +173,7 @@ function App() {
           <div className="download-section">
             <h3>Available Downloads</h3>
             <div className="download-buttons">
-              <a href="#" className="download-btn windows">
+              <a href="https://ymwljegqufoyonilnoie.supabase.co/storage/v1/object/public/instalations/contrack.exe" className="download-btn windows">
                 <span className="download-icon">⊞</span>
                 <span className="download-text">
                   <span className="download-label">Download for</span>
