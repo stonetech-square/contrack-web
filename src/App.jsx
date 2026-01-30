@@ -187,13 +187,13 @@ function App() {
                   <span className="download-platform">macOS</span>
                 </span>
               </a>
-              <a href="#" className="download-btn linux">
+              {/* <a href="#" className="download-btn linux">
                 <span className="download-icon">⬡</span>
                 <span className="download-text">
                   <span className="download-label">Download for</span>
                   <span className="download-platform">Linux</span>
                 </span>
-              </a>
+              </a> */}
             </div>
           </div>
           {status === 'downloads' && (
